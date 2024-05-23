@@ -1,0 +1,56 @@
+import universidades.*
+import profesionales.*
+import empresas.*
+
+describe "Test de Profesionales" {
+	
+	const sm = new Universidad(provincia="Buenos Aires", honorariosRecomendados=3500)
+	const ro = new Universidad(provincia="Santa Fe", honorariosRecomendados= 2800)
+	const co = new Universidad(provincia="Corrientes", honorariosRecomendados= 4200)
+	const hm = new Universidad(provincia="Buenos Aires", honorariosRecomendados= 8800)
+	
+	
+	const juana = new ProfesionalVinculado(universidad=ro)
+	const melina = new ProfesionalAsociado(universidad=co)
+	const rocio = new ProfesionalLibre(universidad=hm, honorarios=5000, provincias=#{"Santa Fe", "Cordoba", "Buenos Aires"})
+	const lucia = new ProfesionalLibre(universidad=ro, honorarios=3200, provincias=#{"Santa Fe", "Entre Rios"})
+	
+	const e1 = new Empresa(honorariosRef=3500)
+	
+	method initialize() {
+		e1.agregarProfesional(juana)
+		e1.agregarProfesional(melina)
+		e1.agregarProfesional(rocio)
+		e1.agregarProfesional(lucia)
+	}
+	
+	test "Cuantos Estudiaron en Rosario" {
+		assert.equals(2, e1.cuantosEstudiaron(ro))
+	}
+	
+	test "Cuantos Estudiaron en Hurlingham" {
+		assert.equals(1, e1.cuantosEstudiaron(hm))
+	}
+	
+	test "Cuantos Estudiaron en Correintes" {
+		assert.equals(1, e1.cuantosEstudiaron(co))
+	}
+	
+	test "Cuantos Estudiaron en San Martin" {
+		assert.equals(0, e1.cuantosEstudiaron(sm))
+	}
+	
+	test "Profesionales Caros" {
+		assert.equals(#{melina, rocio}, e1.profesionalesCaros())
+	}
+	
+	test "universiades Formadoras" {
+		assert.equals(#{ro, co, hm}, e1.formadoras())
+	}
+	
+	test "profesional mas barato" {
+		assert.equals(juana, e1.profesionalMasBarato())
+	}
+	
+
+}
