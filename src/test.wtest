@@ -1,21 +1,40 @@
 import universidades.*
 import profesionales.*
 import empresas.*
+import solicitantes.*
 
 describe "Test de Profesionales" {
-	
+	// universidades
 	const sm = new Universidad(provincia="Buenos Aires", honorariosRecomendados=3500)
 	const ro = new Universidad(provincia="Santa Fe", honorariosRecomendados= 2800)
 	const co = new Universidad(provincia="Corrientes", honorariosRecomendados= 4200)
 	const hm = new Universidad(provincia="Buenos Aires", honorariosRecomendados= 8800)
 	
-	
-	const juana = new ProfesionalVinculado(universidad=ro)
-	const melina = new ProfesionalAsociado(universidad=co)
-	const rocio = new ProfesionalLibre(universidad=hm, honorarios=5000, provincias=#{"Santa Fe", "Cordoba", "Buenos Aires"})
-	const lucia = new ProfesionalLibre(universidad=ro, honorarios=3200, provincias=#{"Santa Fe", "Entre Rios"})
+	//profesionales
+	const juana = new ProfesionalVinculado(universidad=ro, importeDinero = 10000)
+	const melina = new ProfesionalAsociado(universidad=co, importeDinero = 8000)
+	const rocio = new ProfesionalLibre(universidad=hm, honorarios=5000, provincias=#{"Santa Fe", "Cordoba", "Buenos Aires"}, totalRecaudado = 5000)
+	const lucia = new ProfesionalLibre(universidad=ro, honorarios=3200, provincias=#{"Santa Fe", "Entre Rios"},totalRecaudado = 7000)
 	
 	const e1 = new Empresa(honorariosRef=3500)
+	
+	// solicitantes
+	
+	const personaNadieLoPuedeAtender = new SolicitantePersona(provincia="San Juan")
+	const personaQuePudesSerAtendido = new SolicitantePersona(provincia="Buenos Aires")
+	const institucionNadieLoPuedeAtender = new SolicitanteInstitucion(
+		universidadReconocida = #{sm}
+	)
+	const institucionQuePudesSerAtendido = new SolicitanteInstitucion(
+		universidadReconocida = #{sm,hm}
+	)
+	
+	const clubNadieLoPuedeAteneder = new SolicitanteClubes(
+		provinciasDondeEsta = #{"San Juan", "La Rioja", "Mendoza"}
+	)
+	const clubQuePuedeSerAtendido = new SolicitanteClubes(
+		provinciasDondeEsta = #{"San Juan", "Cordoba", "Mendoza"}
+	)
 	
 	method initialize() {
 		e1.agregarProfesional(juana)
@@ -24,6 +43,7 @@ describe "Test de Profesionales" {
 		e1.agregarProfesional(lucia)
 	}
 	
+	// etapa 1
 	test "Cuantos Estudiaron en Rosario" {
 		assert.equals(2, e1.cuantosEstudiaron(ro))
 	}
@@ -51,6 +71,43 @@ describe "Test de Profesionales" {
 	test "profesional mas barato" {
 		assert.equals(juana, e1.profesionalMasBarato())
 	}
+	//etapa 2
+	test "Empresa no puede ateneder a solicitare persona" {
+		assert.notThat(e1.satisfaceA(personaNadieLoPuedeAtender))
+	}
 	
+	test "Empresa que si puede satisfacer a persona" {
+		assert.that(e1.satisfaceA(personaQuePudesSerAtendido))
+	}
+	
+	test "Empresa no puede ateneder a solicitare Institucion" {
+		assert.notThat(e1.satisfaceA(institucionNadieLoPuedeAtender))
+	}
+	
+	test "Empresa que si puede satisfacer a Institucion" {
+		assert.that(e1.satisfaceA(institucionQuePudesSerAtendido))
+	}
+	
+	test "Empresa no puede ateneder a solicitare Club" {
+		assert.notThat(e1.satisfaceA(clubNadieLoPuedeAteneder))
+	}
+	
+	test "Empresa que si puede satisfacer a Club" {
+		assert.that(e1.satisfaceA(clubQuePuedeSerAtendido))
+	}
+	//etapa 3
+	test "donacion vinculado" {
+		assert.equals(5000, juana.donaAlaUniversidad(ro))
+	}
+	
+	test "donacion asociado" {
+		assert.equals(8000, melina.donaAlaAsociacion(asociacionLitoral))
+	}
+	
+	test "pasar dinero de profesional libre a profesional libre" {
+		rocio.pasarDinero(lucia, 4000)
+		assert.equals(1000, rocio.totalRecaudado())
+		assert.equals(11000, lucia.totalRecaudado())
+	}
 
 }

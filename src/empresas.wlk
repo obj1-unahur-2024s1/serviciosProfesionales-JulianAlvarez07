@@ -1,5 +1,7 @@
 import profesionales.*
 import universidades.*
+import solicitantes.*
+
 
 class Empresa {
 	var property profesionales = []
@@ -49,4 +51,11 @@ class Empresa {
 			{p=>p.provincias().size() > 3}	//.size() para saber el numero de provincias del conjunto
 		)	
 	}
+	
+	method satisfaceA(unSolicitante){
+		return profesionales.any(			// si algun solcitante puede ser atendido por un profesional
+			{prof => unSolicitante.puedeSerAtendidoPor(prof)}
+		)
+	}
+	
 }
